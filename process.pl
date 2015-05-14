@@ -21,7 +21,7 @@ use Data::Dumper;
 # in this case.  However, it's probably not the most efficient solution
 # since I end up having to sort the hashes.  Still, it works ok here.
 my %TargetCount = ();
-my $TargetSum = 0;
+my $TargetSum = ();
 my %SourceMax = ();
 my %ProbesPerMinute = ();
 
