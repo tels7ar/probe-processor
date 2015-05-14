@@ -12,7 +12,7 @@
 #       "target": "target176",
 #       "sample_ms": 875
 #    },
-# (there are multiple probes per second)
+# (there are multiple entries (probes) per second)
 
 use JSON::Parse 'json_file_to_perl';
 use Data::Dumper;
@@ -66,7 +66,7 @@ while ( my ($timestamp, $probes ) = each (%{$input}) )
 }
 
 # %TargetCount now contains a count of how many times each target appears.
-# find the keys with the 10 highest values
+# Find the keys with the 10 highest values.
 my @keys = sort {
     $TargetCount{$b} <=> $TargetCount{$a}
 } keys %TargetCount;
@@ -74,7 +74,6 @@ my @keys = sort {
 my @MostFreqTargets = @keys[0..9];
 
 print "Average response time for top 10 most frequent targets (in ms):\n";
-
 foreach my $target (@MostFreqTargets)
 {
     # Now that we have sums and counts for each target it is a
