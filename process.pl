@@ -25,9 +25,11 @@ my %TargetSum = ();
 my %SourceMax = ();
 my %ProbesPerMinute = ();
 
+($#ARGV == 0) or die "usage: $0 <data file>";
+
 # this won't scale well with very large files since
 # we are reading it all in to memory but what the heck
-my $input = json_file_to_perl ('dataset.json');
+my $input = json_file_to_perl ($ARGV[0]);
 
 # The keys of %input are the timestamps
 # Each timestamp value is an array entry
@@ -57,8 +59,8 @@ while ( my ($timestamp, $probes ) = each (%{$input}) )
             $SourceMax{$source} = $sample_ms;
         } elsif ( $sample_ms > $SourceMax{$source} )
         {
-            # if this sample has a higher value than previously seen,
-            # save it in $SourceMax
+            # otherwise, if this sample has a higher value than
+            # previously seen, save it in $SourceMax
             $SourceMax{$source} = $sample_ms;
         }
     }
@@ -67,6 +69,8 @@ while ( my ($timestamp, $probes ) = each (%{$input}) )
 
 # %TargetCount now contains a count of how many times each target appears.
 # Find the keys with the 10 highest values.
+# Again, not the most efficient way to go about this, but sufficient
+# for this dataset.
 my @keys = sort {
     $TargetCount{$b} <=> $TargetCount{$a}
 } keys %TargetCount;
@@ -76,8 +80,10 @@ my @MostFreqTargets = @keys[0..9];
 print "Average response time for top 10 most frequent targets (in ms):\n";
 foreach my $target (@MostFreqTargets)
 {
-    # Now that we have sums and counts for each target it is a
-    # simple matter to do some division to get the average.
+    # Now that we have sums and counts for each target it is a simple
+    # matter to do some division to get the average.  For larger
+    # datasets this could be changed to a moving average to avoid
+    # having to keep a counter and accumulator (which could overflow).
     my $avg = $TargetSum{$target} / $TargetCount{$target};
     print "$target: $avg\n";
 }
@@ -86,7 +92,7 @@ foreach my $target (@MostFreqTargets)
 # TODO: This should probably be improved to print '0' for
 # minutes in which no probes occur.
 print "\nNumber of probes per minute:\n";
-# Do a strimp compare to sort this out.
+# Do a string compare to sort this out.
 foreach my $Minute (sort {$a cmp $b} keys %ProbesPerMinute)
 {
     print "$Minute: $ProbesPerMinute{$Minute}\n";
@@ -94,7 +100,8 @@ foreach my $Minute (sort {$a cmp $b} keys %ProbesPerMinute)
 
 # Print the max time for each source
 print "\nMaximum time for each source (in ms):\n";
-# do an alpha sort to mae the output look nice
+# Do an alpha sort to make the output look nice. The format of the
+# datestrings ensures that this works even through day rollover, etc.
 foreach my $source (sort {$a cmp $b} keys %SourceMax)
 {
     print $source . ": " . $SourceMax{$source} . "\n";
