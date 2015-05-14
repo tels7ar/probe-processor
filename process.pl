@@ -74,7 +74,6 @@ sub ProcessInput
     }
 }
 
-
 sub CountTargets
 {
     # %TargetCount now contains a count of how many times each target appears.
@@ -127,6 +126,7 @@ sub PrintMaxTimes
     }
 }
 
+# main
 ProcessInput;
 CountTargets;
 PrintAvgResponses;
